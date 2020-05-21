@@ -114,33 +114,57 @@ import java.util.ArrayList;
             return notes;
         }
 
-//        public ArrayList<String> getNoteContent() {
-//            //TODO return records in Strings
-//
-//            // Create an ArrayList that holds String objects
-//            ArrayList<String> notes = new ArrayList<String>();
-//            // Select all the notes' content
-//            String selectQuery = "SELECT " + COLUMN_NOTE_CONTENT + " FROM "
-//                    + TABLE_NOTE;
-//
-//            // Get the instance of database to read
-//            SQLiteDatabase db = this.getReadableDatabase();
-//            // Run the SQL query and get back the Cursor object
-//            Cursor cursor = db.rawQuery(selectQuery, null);
-//            // moveToFirst() moves to first row
-//            if (cursor.moveToFirst()) {
-//                // Loop while moveToNext() points to next row and returns true;
-//                // moveToNext() returns false when no more next row to move to
-//                do {
-//                    // Add the note content to the ArrayList object
-//                    notes.add(cursor.getString(0));
-//                } while (cursor.moveToNext());
-//            }
-//            // Close connection
-//            cursor.close();
-//            db.close();
-//
-//            return notes;
-//        }
+        public ArrayList<Song> getAllSongsByStars(int stars) {
+            ArrayList<Song> songs = new ArrayList<Song>();
 
+            SQLiteDatabase db = this.getReadableDatabase();
+            String[] columns= {COLUMN_ID, COLUMN_TITLE, COLUMN_SINGERS, COLUMN_YEAR, COLUMN_STARS};
+            String condition = COLUMN_STARS + "Like ?";
+            String[] args = {"%" + stars + "%"};
+            Cursor cursor = db.query(TABLE_SONG, columns, condition, args,
+                    null, null, null, null);
+
+            if (cursor.moveToFirst()) {
+                do {
+                    int id = cursor.getInt(0);
+                    String title = cursor.getString(1);
+                    String singers = cursor.getString(2);
+                    int year = cursor.getInt(3);
+                    Song note = new Song(id, title, singers, year, stars);
+                    songs.add(note);
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            db.close();
+            return songs;
+        }
+
+        public int updateSong(Song data) {
+            SQLiteDatabase db = this.getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_TITLE, data.getTitle());
+            values.put(COLUMN_SINGERS, data.getSingers());
+            values.put(COLUMN_YEAR, data.getYear());
+            values.put(COLUMN_STARS, data.getStars());
+            String condition = COLUMN_ID + "= ?";
+            String[] args = {String.valueOf(data.getId())};
+            int result = db.update(TABLE_SONG, values, condition, args);
+            db.close();
+            if (result < 1){
+                Log.d("DBHelper", "Update failed");
+            }
+            return result;
+        }
+
+        public int deleteSong(int id){
+            SQLiteDatabase db = this.getWritableDatabase();
+            String condition = COLUMN_ID + "= ?";
+            String[] args = {String.valueOf(id)};
+            int result = db.delete(TABLE_SONG, condition, args);
+            db.close();
+            if (result < 1){
+                Log.d("DBHelper", "Update failed");
+            }
+            return result;
+        }
 }

@@ -35,20 +35,19 @@ public class MainActivity extends AppCompatActivity {
                 DBHelper dbh = new DBHelper(MainActivity.this);
 
                 String title = etSongTitle.getText().toString();
-                String singers = etSongTitle.getText().toString();
-                int year = Integer.valueOf(etSongTitle.getText().toString());
+                String singers = etSingers.getText().toString();
+                int year = Integer.valueOf(etYear.getText().toString());
                 int stars = getStars();
                 dbh.insertNote(title, singers, year, stars);
                 Toast.makeText(MainActivity.this, "Inserted", Toast.LENGTH_LONG).show();
         }
     });
 
-        btnShowList.setOnClickListener(new View.OnClickListener()
-
-    {
+        btnShowList.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick (View arg0){
-        Intent i = new Intent(MainActivity.this, ShowSongActivity.class);
+        Intent i = new Intent(MainActivity.this, SecondActivity.class);
+        i.putExtra("stars", getStars());
         startActivity(i);
     }
     });
